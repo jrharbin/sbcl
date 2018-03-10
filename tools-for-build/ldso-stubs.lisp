@@ -1,5 +1,5 @@
 ;;;; Generate stubs for C-linkage library functions which we need to refer to
-;;;; from Lisp.
+11;rgb:0000/0000/0000;;;; from Lisp.
 ;;;;
 ;;;; (But note this is only the Linux version, as per the FIXME
 ;;;; note in the BSD version in undefineds.h.)
@@ -121,6 +121,17 @@ ldso_stub__ ## fct: ;                           \\
         .text"
 
 #!+(and (not darwin) ppc) "
+#define LDSO_STUBIFY(fct)                       \\
+.globl ldso_stub__ ## fct ;                     \\
+        .type    ldso_stub__ ## fct,@function ; \\
+ldso_stub__ ## fct: ;                           \\
+        b fct ;                                 \\
+.L ## fct ## e1: ;                              \\
+        .size    ldso_stub__ ## fct,.L ## fct ## e1-ldso_stub__ ## fct ;"
+
+;;; JRH: copying the LDSO definition from ppc64le. It will probably have
+;;; to be customized for the POWER9 ABI, but sort it out later
+#!+(and (not darwin) ppc64le) "
 #define LDSO_STUBIFY(fct)                       \\
 .globl ldso_stub__ ## fct ;                     \\
         .type    ldso_stub__ ## fct,@function ; \\

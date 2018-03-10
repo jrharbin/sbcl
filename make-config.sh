@@ -375,6 +375,7 @@ case `uname -m` in
     sparc*) guessed_sbcl_arch=sparc ;;
     sun*) guessed_sbcl_arch=sparc ;;
     *ppc) guessed_sbcl_arch=ppc ;;
+    ppc64le) guessed_sbcl_arch=ppc ;; # JRH: should be a new arch spec ppc64le?
     ppc64) guessed_sbcl_arch=ppc ;;
     Power*Macintosh) guessed_sbcl_arch=ppc ;;
     ibmnws) guessed_sbcl_arch=ppc ;;
@@ -700,8 +701,9 @@ elif [ "$sbcl_arch" = "ppc" ]; then
         # versions 2.3.1 and 2.3.2
         #
         # FIXME: integrate to grovel-features, mayhaps
-	$GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
-	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
+#	$GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
+#	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
+	echo "Removed mcontext"
     elif [ "$sbcl_os" = "darwin" ]; then
         # We provide a dlopen shim, so a little lie won't hurt
 	printf ' :os-provides-dlopen' >> $ltf
@@ -771,7 +773,10 @@ fi
 # cross-compilers!
 #
 # FIXME: integrate to grovel-features, mayhaps
-$GNUMAKE -C tools-for-build determine-endianness -I ../src/runtime
+# $GNUMAKE -C tools-for-build determine-endianness -I ../src/runtime
+
+# This always assumes little endian for ppc64le
+`cd tools-for-build && cc -I../src/runtime determine-endianness.c  -ldl -o determine-endianness`
 tools-for-build/determine-endianness >> $ltf
 
 export sbcl_os sbcl_arch
