@@ -112,7 +112,7 @@
     (symbol (unless (member feature '(:ansi-cl :common-lisp :ieee-floating-point))
               (when (member feature *shebang-features* :test #'eq)
 ;;;                (error "probable XC bug in host read-time conditional: ~S" feature)
-		   (format t "Removed XC bug check")
+                   (format t "Removed XC bug check")
 ))
             (member feature list :test #'eq))
     (cons (flet ((subfeature-in-list-p (subfeature)

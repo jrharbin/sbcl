@@ -375,7 +375,7 @@ case `uname -m` in
     sparc*) guessed_sbcl_arch=sparc ;;
     sun*) guessed_sbcl_arch=sparc ;;
     *ppc) guessed_sbcl_arch=ppc ;;
-    ppc64le) guessed_sbcl_arch=ppc ;; # JRH: should be a new arch spec ppc64le?
+    ppc64le) guessed_sbcl_arch=ppc64le ;; 
     ppc64) guessed_sbcl_arch=ppc ;;
     Power*Macintosh) guessed_sbcl_arch=ppc ;;
     ibmnws) guessed_sbcl_arch=ppc ;;
@@ -695,6 +695,39 @@ elif [ "$sbcl_arch" = "ppc" ]; then
     printf ' :stack-allocatable-lists :stack-allocatable-fixed-objects' >> $ltf
     printf ' :linkage-table :raw-instance-init-vops :memory-barrier-vops' >> $ltf
     printf ' :compare-and-swap-vops :multiply-high-vops :alien-callbacks' >> $ltf
+
+
+    
+    if [ "$sbcl_os" = "linux" ]; then
+        # Use a C program to detect which kind of glibc we're building on,
+        # to bandage across the break in source compatibility between
+        # versions 2.3.1 and 2.3.2
+        #
+        # FIXME: integrate to grovel-features, mayhaps
+	$GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
+	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
+	echo "Removed mcontext"
+    elif [ "$sbcl_os" = "darwin" ]; then
+        # We provide a dlopen shim, so a little lie won't hurt
+	printf ' :os-provides-dlopen' >> $ltf
+        # The default stack ulimit under darwin is too small to run PURIFY.
+        # Best we can do is complain and exit at this stage
+	if [ "`ulimit -s`" = "512" ]; then
+            echo "Your stack size limit is too small to build SBCL."
+            echo "See the limit(1) or ulimit(1) commands and the README file."
+            exit 1
+	fi
+    fi
+
+    
+elif [ "$sbcl_arch" = "ppc64le" ]; then
+    printf ' :gencgc :stack-allocatable-closures :stack-allocatable-vectors' >> $ltf
+    printf ' :stack-allocatable-lists :stack-allocatable-fixed-objects' >> $ltf
+    printf ' :linkage-table :raw-instance-init-vops :memory-barrier-vops' >> $ltf
+    printf ' :compare-and-swap-vops :multiply-high-vops :alien-callbacks' >> $ltf
+
+
+    
     if [ "$sbcl_os" = "linux" ]; then
         # Use a C program to detect which kind of glibc we're building on,
         # to bandage across the break in source compatibility between
@@ -715,6 +748,7 @@ elif [ "$sbcl_arch" = "ppc" ]; then
             exit 1
 	fi
     fi
+    
 elif [ "$sbcl_arch" = "sparc" ]; then
     # Test the compiler in order to see if we are building on Sun
     # toolchain as opposed to GNU binutils, and write the appropriate

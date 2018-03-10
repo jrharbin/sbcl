@@ -470,13 +470,13 @@
  ("src/compiler/target-main" :not-host)
  ("src/compiler/ir1tran")
  ("src/compiler/ir1tran-lambda")
- 
+
  ;; JRH: ignore a warning about being unable to compile a function in this when
  ;; bootstrapping PPC64le with ABCL
  ;; This should have a check with #+(and abcl ppc64le) but this isn't working
  ;; for some reason
  ("src/compiler/ir1-translators" :ignore-failure-p)
- 
+
  ;; FIXME: #+ should be (and sb-xc-host) but it isn't set yet.
  ("src/compiler/ir1util" #+cmucl :ignore-failure-p)
  ("src/compiler/callable-args")
