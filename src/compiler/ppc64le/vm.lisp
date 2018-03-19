@@ -95,8 +95,7 @@
 
 
 
-;;;; SB and SC definition:
-
+;; JRH: 32 general purpose registers, and 32 float
 (!define-storage-bases
 (define-storage-base registers :finite :size 32)
 (define-storage-base float-registers :finite :size 32)
