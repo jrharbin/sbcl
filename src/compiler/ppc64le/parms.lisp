@@ -14,11 +14,11 @@
 (in-package "SB!VM")
 
 ;;; number of bits per word where a word holds one lisp descriptor
-(defconstant n-word-bits 32)
+(defconstant n-word-bits 64)
 
 ;;; the natural width of a machine word (as seen in e.g. register width,
 ;;; address space)
-(defconstant n-machine-word-bits 32)
+(defconstant n-machine-word-bits 64)
 
 ;;; flags for the generational garbage collector
 (defconstant pseudo-atomic-interrupted-flag 1)

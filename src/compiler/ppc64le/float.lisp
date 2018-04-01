@@ -10,8 +10,20 @@
 ;;;; files for more information.
 
 (in-package "SB!VM")
+
+;; JRH: single floats should presumably still be 32 bits
+;; For some reason this is not defined for any other backend, why?
+;; Is something commented out or not set in selected *features*?
+(defvar single-float-size 32)
+
+;; What should single-float-value-slot be?
+(defvar single-float-value-slot 0)
+
+
 
 ;;;; Move functions:
+
+
 
 (define-move-fun (load-single 1) (vop x y)
   ((single-stack) (single-reg))
@@ -462,8 +474,9 @@
                 (:save-p :compute-only)
                 (:generator 5
                   (let* ((nfp-tn (current-nfp-tn vop))
-                         (temp-offset-high (* (tn-offset temp) n-word-bytes))
-                         (temp-offset-low (+ temp-offset-high n-word-bytes)))
+                         (temp-offset-high (* (tn-offset temp) 32))  ;; JRH: this needs to
+                         (temp-offset-low (+ temp-offset-high 32)))  ;; be fixed for double
+                                                                     ;; floats
                     (inst lis rtemp #x4330) ; High word of magic constant
                     (inst stw rtemp nfp-tn temp-offset-high)
                     (inst lis rtemp #x8000)
@@ -691,6 +704,8 @@
 ;;;; Float mode hackery:
 
 (sb!xc:deftype float-modes () '(unsigned-byte 32))
+(sb!xc:deftype float-modes () '(signed-byte 64))
+
 (defknown floating-point-modes () float-modes (flushable))
 (defknown ((setf floating-point-modes)) (float-modes)
   float-modes)

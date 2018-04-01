@@ -698,27 +698,27 @@
   (:generator 1
     (inst not res x)))
 
-(define-vop (fast-ash-left-mod32-c/unsigned=>unsigned
+(define-vop (fast-ash-left-mod64-c/unsigned=>unsigned
              fast-ash-c/unsigned=>unsigned)
-  (:translate ash-left-mod32))
+  (:translate ash-left-mod64))
 
-(define-vop (fast-ash-left-mod32/unsigned=>unsigned
+(define-vop (fast-ash-left-mod64/unsigned=>unsigned
              fast-ash-left/unsigned=>unsigned))
-(deftransform ash-left-mod32 ((integer count)
-                              ((unsigned-byte 32) (unsigned-byte 5)))
+(deftransform ash-left-mod64 ((integer count)
+                              ((unsigned-byte 64) (unsigned-byte 5)))
   (when (sb!c::constant-lvar-p count)
     (sb!c::give-up-ir1-transform))
-  '(%primitive fast-ash-left-mod32/unsigned=>unsigned integer count))
+  '(%primitive fast-ash-left-mod64/unsigned=>unsigned integer count))
 
 (macrolet
     ((define-modular-backend (fun &optional constantp)
-       (let ((mfun-name (symbolicate fun '-mod32))
-             (modvop (symbolicate 'fast- fun '-mod32/unsigned=>unsigned))
-             (modcvop (symbolicate 'fast- fun 'mod32-c/unsigned=>unsigned))
+       (let ((mfun-name (symbolicate fun '-mod64))
+             (modvop (symbolicate 'fast- fun '-mod64/unsigned=>unsigned))
+             (modcvop (symbolicate 'fast- fun 'mod64-c/unsigned=>unsigned))
              (vop (symbolicate 'fast- fun '/unsigned=>unsigned))
              (cvop (symbolicate 'fast- fun '-c/unsigned=>unsigned)))
          `(progn
-            (define-modular-fun ,mfun-name (x y) ,fun :untagged nil 32)
+            (define-modular-fun ,mfun-name (x y) ,fun :untagged nil 64)
             (define-vop (,modvop ,vop)
               (:translate ,mfun-name))
             ,@(when constantp

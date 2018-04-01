@@ -123,6 +123,27 @@
         (inst b? (if not-p :ne :eq) target)
         (emit-label not-target)))))
 
+;; JRH: probably need a definition for signed-byte-64
+;; need to translate these assembly VOPs here
+;; quote it for now
+'(define-vop (signed-byte-64-p type-predicate)
+  (:translate signed-byte-64-p)
+  (:generator 45
+    (let ((not-target (gen-label)))
+      (multiple-value-bind
+          (yep nope)
+          (if not-p
+              (values not-target target)
+              (values target not-target))
+        (inst andi. temp value fixnum-tag-mask)
+        (inst beq yep)
+        (test-type value nope t (other-pointer-lowtag) :temp temp)
+        (loadw temp value 0 other-pointer-lowtag)
+        (inst cmpwi temp (+ (ash 1 n-widetag-bits)
+                          bignum-widetag))
+        (inst b? (if not-p :ne :eq) target)
+        (emit-label not-target)))))
+
 ;;; An (unsigned-byte 32) can be represented with either a positive fixnum, a
 ;;; bignum with exactly one positive digit, or a bignum with exactly two digits
 ;;; and the second digit all zeros.
@@ -171,6 +192,8 @@
         (inst b?  :cr1 (if not-p :lt :ge) target)
 
         (emit-label not-target)))))
+
+
 
 ;;;; List/symbol types:
 ;;;

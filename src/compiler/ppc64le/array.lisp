@@ -127,9 +127,13 @@
     positive-fixnum unsigned-reg)
   (def-data-vector-frobs simple-array-unsigned-byte-16 halfword-index
     positive-fixnum unsigned-reg)
-  (def-data-vector-frobs simple-array-unsigned-byte-31 word-index
+  (def-data-vector-frobs simple-array-unsigned-byte-31 halfword-index
+    positive-fixnum unsigned-reg)
+  (def-data-vector-frobs simple-array-unsigned-byte-32 halfword-index
+    positive-fixnum unsigned-reg)
+  (def-data-vector-frobs simple-array-unsigned-byte-63 word-index
     unsigned-num unsigned-reg)
-  (def-data-vector-frobs simple-array-unsigned-byte-32 word-index
+  (def-data-vector-frobs simple-array-unsigned-byte-64 word-index
     unsigned-num unsigned-reg)
 
   (def-data-vector-frobs simple-array-unsigned-fixnum word-index
@@ -137,7 +141,11 @@
   (def-data-vector-frobs simple-array-fixnum word-index
     tagged-num any-reg)
   (def-data-vector-frobs simple-array-signed-byte-32 word-index
+    signed-num signed-reg)
+  (def-data-vector-frobs simple-array-signed-byte-64 word-index
     signed-num signed-reg))
+
+
 
 (define-vop (%compare-and-swap-svref word-index-cas)
   (:note "inline array compare-and-swap")

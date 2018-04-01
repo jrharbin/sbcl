@@ -704,7 +704,7 @@ elif [ "$sbcl_arch" = "ppc" ]; then
         # versions 2.3.1 and 2.3.2
         #
         # FIXME: integrate to grovel-features, mayhaps
-	$GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
+	$GNUMAKE -C tools-for-build/where-is-mcontext -I ../src/runtime
 	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
 	echo "Removed mcontext"
     elif [ "$sbcl_os" = "darwin" ]; then
@@ -721,7 +721,7 @@ elif [ "$sbcl_arch" = "ppc" ]; then
 
     
 elif [ "$sbcl_arch" = "ppc64le" ]; then
-    printf ' :gencgc :stack-allocatable-closures :stack-allocatable-vectors' >> $ltf
+    printf ' :64-bit :64-bit-registers :gencgc :stack-allocatable-closures :stack-allocatable-vectors' >> $ltf
     printf ' :stack-allocatable-lists :stack-allocatable-fixed-objects' >> $ltf
     printf ' :linkage-table :raw-instance-init-vops :memory-barrier-vops' >> $ltf
     printf ' :compare-and-swap-vops :multiply-high-vops :alien-callbacks' >> $ltf
@@ -734,9 +734,8 @@ elif [ "$sbcl_arch" = "ppc64le" ]; then
         # versions 2.3.1 and 2.3.2
         #
         # FIXME: integrate to grovel-features, mayhaps
-#	$GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
-#	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
-	echo "Removed mcontext"
+	`cd tools-for-build && cc -I../src/runtime where-is-mcontext.c  -ldl -o where-is-mcontext`
+	tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
     elif [ "$sbcl_os" = "darwin" ]; then
         # We provide a dlopen shim, so a little lie won't hurt
 	printf ' :os-provides-dlopen' >> $ltf

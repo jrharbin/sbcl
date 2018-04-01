@@ -110,6 +110,32 @@
                    (,endtest (truly-the list ,n-first))
                    ,call)))))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; These are copied here temporarily ...
+(define-condition serious-condition (condition) ())
+
+(define-condition error (serious-condition) ())
+
+(define-condition warning (condition) ())
+(define-condition style-warning (warning) ())
+
+(define-condition redefinition-warning (style-warning)
+  ((name
+    :initarg :name
+    :reader redefinition-warning-name)
+   (new-location
+    :initarg :new-location
+    :reader redefinition-warning-new-location)))
+
+(define-condition redefinition-with-deftransform (redefinition-warning)
+  ((transform :initarg :transform
+              :reader redefinition-with-deftransform-transform))
+  (:report (lambda (warning stream)
+             (format stream "Overwriting ~S"
+                     (redefinition-with-deftransform-transform warning)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (define-source-transform mapc (function list &rest more-lists)
   (mapfoo-transform function (cons list more-lists) nil t))
 

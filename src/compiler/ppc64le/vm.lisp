@@ -102,8 +102,7 @@
 (define-storage-base control-stack :unbounded :size 8)
 (define-storage-base non-descriptor-stack :unbounded :size 0)
 (define-storage-base constant :non-packed)
-(define-storage-base immediate-constant :non-packed)
-)
+(define-storage-base immediate-constant :non-packed))
 
 (!define-storage-classes
 
@@ -145,8 +144,8 @@
    :alternate-scs (control-stack))
 
   ;; The non-descriptor stacks.
-  (signed-stack non-descriptor-stack) ; (signed-byte 32)
-  (unsigned-stack non-descriptor-stack) ; (unsigned-byte 32)
+  (signed-stack non-descriptor-stack) ; (signed-byte 64)
+  (unsigned-stack non-descriptor-stack) ; (unsigned-byte 64)
   (character-stack non-descriptor-stack) ; non-descriptor characters.
   (sap-stack non-descriptor-stack) ; System area pointers.
   (single-stack non-descriptor-stack) ; single-floats
@@ -350,15 +349,15 @@
       (logtest
        (cond
          ((or (valid-funtype '(fixnum fixnum) '*)
-              (valid-funtype '((signed-byte 32) (signed-byte 32)) '*)
-              (valid-funtype '((unsigned-byte 32) (unsigned-byte 32)) '*))
+              (valid-funtype '((signed-byte 64) (signed-byte 64)) '*)
+              (valid-funtype '((unsigned-byte 64) (unsigned-byte 64)) '*))
           (values :maybe nil))
          (t (values :default nil))))
       (logbitp
        (cond
-         ((or (valid-funtype '((constant-arg (integer 0 29)) fixnum) '*)
-              (valid-funtype '((constant-arg (integer 0 31)) (signed-byte 32)) '*)
-              (valid-funtype '((constant-arg (integer 0 31)) (unsigned-byte 32)) '*))
+         ((or (valid-funtype '((constant-arg (integer 0 63)) fixnum) '*)
+              (valid-funtype '((constant-arg (integer 0 63)) (signed-byte 64)) '*)
+              (valid-funtype '((constant-arg (integer 0 63)) (unsigned-byte 64)) '*))
           (values :transform '(lambda (index integer)
                                (%logbitp integer index))))
          (t (values :default nil))))
@@ -376,8 +375,8 @@
                               (sb!c::lvar-value posn))
                            width)))))
          (if (or (validp 'fixnum 29)
-                 (validp '(signed-byte 32) 32)
-                 (validp '(unsigned-byte 32) 32))
+                 (validp '(signed-byte 64) 64)
+                 (validp '(unsigned-byte 64) 64))
              (values :transform '(lambda (size posn integer)
                                   (%%ldb integer size posn)))
              (values :default nil))))
